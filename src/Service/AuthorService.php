@@ -27,6 +27,11 @@ class AuthorService
         $this->authorRepository = $em->getRepository(Author::class);
     }
 
+    /**
+     * @param string $name
+     * @param string $surname
+     * @param int|null $idBook
+     */
     public function createNewAuthor(string $name, string $surname, ?int $idBook)
     {
         if ($idBook >= 1){
@@ -46,6 +51,13 @@ class AuthorService
         $this->em->flush();
 
     }
+
+    /**
+     * @param int $idAuthor
+     * @param string|null $name
+     * @param string|null $surname
+     * @param int|null $idBook
+     */
     public function editAuthor(int $idAuthor, ?string $name, ?string $surname, ?int $idBook)
     {
         $author = $this->authorRepository->find($idAuthor);
@@ -73,24 +85,32 @@ class AuthorService
         }
     }
 
+    /**
+     * @param array $data
+     */
     public function removeAuthorsByNameAndSurname(array $data)
     {
         if (isset($data['name']) && isset($data['surname'])) {
+
             $authors = $this->authorRepository->findBy([
                 'name' => $data['name'],
                 'surname' => $data['surname']
             ]);
-        }
 
-        if (isset($authors) && $authors != null) {
-            foreach ($authors as $author) {
-                $this->em->remove($author);
+            if (isset($authors) && $authors != null) {
+                foreach ($authors as $author) {
+                    $this->em->remove($author);
+                }
+
+                $this->em->flush();
             }
-
-            $this->em->flush();
         }
     }
 
+    /**
+     * @param array $data
+     * @return array
+     */
     public function getAuthors(array $data): array
     {
         /** @var AuthorRepository $repository */

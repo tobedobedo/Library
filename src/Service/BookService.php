@@ -27,9 +27,15 @@ class BookService
         $this->bookRepository = $em->getRepository(Book::class);
     }
 
-    public function createNewBook(string $name, int $year, int $idPubHouse, ?int $idAuthor)
+    /**
+     * @param string $name
+     * @param int $year
+     * @param int|null $idPubHouse
+     * @param int|null $idAuthor
+     */
+    public function createNewBook(string $name, int $year, ?int $idPubHouse, ?int $idAuthor)
     {
-        if ($idAuthor >= 1){
+        if ($idAuthor >= 1) {
 
             /** @var AuthorRepository $repository */
             $repository = $this->em->getRepository(Author::class);
@@ -37,7 +43,7 @@ class BookService
 
         }
 
-        if ($idPubHouse >= 1){
+        if ($idPubHouse >= 1) {
 
             /** @var PublishingHouseRepository $repository */
             $repository = $this->em->getRepository(PublishingHouse::class);
@@ -56,9 +62,16 @@ class BookService
 
     }
 
+    /**
+     * @param int $idBook
+     * @param string|null $name
+     * @param int|null $year
+     * @param int|null $idPubHouse
+     * @param int|null $idAuthor
+     */
     public function editBook(int $idBook, ?string $name, ?int $year, ?int $idPubHouse, ?int $idAuthor)
     {
-        $book= $this->bookRepository->find($idBook);
+        $book = $this->bookRepository->find($idBook);
 
         /** @var AuthorRepository $repositoryAuthor */
         $repositoryAuthor = $this->em->getRepository(Author::class);
@@ -69,15 +82,30 @@ class BookService
         $pubHouse = $repositoryPublishingHouseRepository->find($idPubHouse);
 
         if ($book != null) {
-            $book->setName($name);
-            $book->setYear($year);
-            $book->setPubHouse($pubHouse);
-            $book->addAuthor($author);
+
+            if (isset($name)) {
+                $book->setName($name);
+            }
+
+            if (isset($year)) {
+                $book->setYear($year);
+            }
+
+            if (isset($author)) {
+                $book->addAuthor($author);
+            }
+
+            if (isset($pubHouse)) {
+                $book->setPubHouse($pubHouse);
+            }
 
             $this->em->flush();
         }
     }
 
+    /**
+     * @param string $pubHouseName
+     */
     public function removeBooksByPubHouseName(string $pubHouseName)
     {
         /** @var PublishingHouseRepository $repositoryPublishingHouseRepository */

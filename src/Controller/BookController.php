@@ -15,7 +15,7 @@ class BookController extends AbstractController
     /**
      * Создание книги
      *
-     * В теле ожидается:
+     * В теле ожидается массив книг, для каждой:
      * - name (обязательно)
      * - year (обязательно)
      * - idPubHouse (обязательно)
@@ -33,8 +33,8 @@ class BookController extends AbstractController
 
         try {
             foreach ($body as $book) {
-                if (isset($book['name']) && isset($book['year']) && $book['idPubHouse']) {
-                    $bookService->createNewBook($book['name'], $book['year'], $book['idPubHouse'], $book['idAuthor'] ?? null);
+                if (isset($book['name']) && isset($book['year'])) {
+                    $bookService->createNewBook($book['name'], $book['year'], $book['idPubHouse'] ?? null, $book['idAuthor'] ?? null);
                 } else {
                     throw new RuntimeException('Не указаны название книги, издательство или год');
                 }

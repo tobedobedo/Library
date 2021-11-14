@@ -24,41 +24,59 @@ class PublishingHouseService
         $this->em = $em;
     }
 
+    /**
+     * @param string $name
+     * @param string $address
+     * @param int|null $idBook
+     */
     public function createPubHouse(string $name, string $address, ?int $idBook)
     {
-        // создать экземпляр и ему присвоить значения в соответствующие поля
-
         if ($idBook >= 1){
-
             /** @var BookRepository $repository */
             $repository = $this->em->getRepository(Book::class);
             $book = $repository->find($idBook);
-
         }
 
         $pubHouse = new PublishingHouse();
         $pubHouse->setName($name);
         $pubHouse->setAddress($address);
-        $pubHouse->addBook($book ?? null);
+
+        if (isset($book)) {
+            $pubHouse->addBook($book);
+        }
 
         $this->em->persist($pubHouse);
         $this->em->flush();
     }
 
-    public function editPubHouse(int $idPubHouse, string $name, string $address)
+    /**
+     * @param int $idPubHouse
+     * @param string|null $name
+     * @param string|null $address
+     */
+    public function editPubHouse(int $idPubHouse, ?string $name, ?string $address)
     {
         /** @var PublishingHouseRepository $repository */
         $repository = $this->em->getRepository(PublishingHouse::class);
         $pubHouse = $repository->find($idPubHouse);
 
         if ($pubHouse != null) {
-            $pubHouse->setName($name);
-            $pubHouse->setAddress($address);
+
+            if (isset($name)) {
+                $pubHouse->setName($name);
+            }
+
+            if (isset($address)) {
+                $pubHouse->setAddress($address);
+            }
 
             $this->em->flush();
         }
     }
 
+    /**
+     * @param array $information
+     */
     public function removePubHouseByNameAndAddress(array $information)
     {
 
@@ -89,6 +107,10 @@ class PublishingHouseService
         }
     }
 
+    /**
+     * @param array $data
+     * @return array
+     */
     public function getPubHouses(array $data): array
     {
         /** @var PublishingHouseRepository $repository */
