@@ -3,26 +3,14 @@
 namespace App\Controller;
 
 use App\Service\BookService;
-use App\Service\PublishingHouseService;
 use Exception;
+use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 
 class BookController extends AbstractController
 {
-    /**
-     * @Route("/book", name="book")
-     */
-    public function index(): Response
-    {
-        return $this->render('book/index.html.twig', [
-            'controller_name' => 'BookController',
-        ]);
-    }
-
     /**
      * @param Request $request
      * @param BookService $bookService
@@ -34,12 +22,19 @@ class BookController extends AbstractController
         $json = $request->getContent();
         $body = json_decode($json, true);
 
-        foreach ($body as $book) {
-            if (isset($book['name']) && isset($book['year'])) {
-                $bookService->createNewBook($book['name'], $book['year'],$book['idAuthor'], $book['idPubHouse']);
-            } else {
-                return new JsonResponse(['success' => false]);
+        try {
+            foreach ($body as $book) {
+                if (isset($book['name']) && isset($book['year'])) {
+                    $bookService->createNewBook($book['name'], $book['year'], $book['idAuthor'] ?? null, $book['idPubHouse'] ?? null);
+                } else {
+                    throw new RuntimeException('Не указаны название книги или год');
+                }
             }
+        } catch (Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
         }
 
         return new JsonResponse(['success' => true]);
@@ -55,17 +50,22 @@ class BookController extends AbstractController
     {
         $json = $request->getContent();
         $body = json_decode($json,true);
-        if (isset($body['idBook'])) {
 
-            $bookService->editBook($body['idBook'], $body['name'] ?? null, $body['year'] ?? null, $body['idAuthor'] ?? null, $body['idPubHouse'] ?? null);
+        try {
+            if (isset($body['idBook'])) {
+                $bookService->editBook($body['idBook'], $body['name'] ?? null, $body['year'] ?? null, $body['idAuthor'] ?? null, $body['idPubHouse'] ?? null);
+            } else {
+                throw new RuntimeException('Не указан идентификатор книги');
+            }
+        } catch (Exception $e) {
 
-        }else{
             return new JsonResponse([
                 'success' => false,
-                'message' => 'Не указан идентификатор книги'
+                'message' => $e->getMessage()
             ]);
         }
-        return new JsonResponse([]);
+
+        return new JsonResponse(['success' => true]);
     }
 
     /**

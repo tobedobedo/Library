@@ -15,16 +15,6 @@ use Symfony\Component\Routing\Annotation\Route;
 class AuthorController extends AbstractController
 {
     /**
-     * @Route("/api/author", name="author")
-     */
-    public function index(): Response
-    {
-        return $this->render('author/index.html.twig', [
-            'controller_name' => 'AuthorController',
-        ]);
-    }
-
-    /**
      * @param Request $request
      * @param AuthorService $authorService
      * @return JsonResponse

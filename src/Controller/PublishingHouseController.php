@@ -2,13 +2,11 @@
 
 namespace App\Controller;
 
-use App\Service\AuthorService;
 use App\Service\PublishingHouseService;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
 
 class PublishingHouseController extends AbstractController
 {
@@ -23,14 +21,22 @@ class PublishingHouseController extends AbstractController
         $json = $request->getContent();
         $body = json_decode($json, true);
 
-        if (isset($body['name']) && isset($body['address'])) {
+        try {
+            if (isset($body['name']) && isset($body['address'])) {
 
-            $publishingHouseService->createPubHouse($body['name'], $body['address'], $body['idBook'] ?? null);
+                $publishingHouseService->createPubHouse($body['name'], $body['address'], $body['idBook'] ?? null);
 
-        }else{
-            return new JsonResponse(['success' => false]);
+            } else {
+                throw new RuntimeException('Не указаны имя или адрес издательства');
+            }
+        } catch (Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
         }
-        return new JsonResponse([]);
+
+        return new JsonResponse(['success' => true]);
     }
 
 
@@ -44,15 +50,22 @@ class PublishingHouseController extends AbstractController
     {
         $json = $request->getContent();
         $body = json_decode($json,true);
-        if (isset($body['idPubHouse'])) {
-            $publishingHouseService->editPubHouse($body['idPubHouse'], $body['name'], $body['address']);
-        }else{
+
+        try {
+
+            if (isset($body['idPubHouse'])) {
+                $publishingHouseService->editPubHouse($body['idPubHouse'], $body['name'] ?? null, $body['address'] ?? null);
+            } else {
+                throw new RuntimeException('Не указан идентификатор издательства');
+            }
+        } catch (Exception $e) {
             return new JsonResponse([
                 'success' => false,
-                'message' => 'Не указан идентификатор издательства'
+                'message' => $e->getMessage()
             ]);
         }
-        return new JsonResponse([]);
+
+        return new JsonResponse(['success' => true]);
     }
 
     /**
