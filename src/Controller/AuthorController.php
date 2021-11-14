@@ -15,6 +15,13 @@ use Symfony\Component\Routing\Annotation\Route;
 class AuthorController extends AbstractController
 {
     /**
+     * Создание автора
+     *
+     * В теле ожидаются поля:
+     * - name (обязательно)
+     * - surname (обязательно)
+     * - idBook (необязательно, для реализации связи с экзмепляром книги)
+     *
      * @param Request $request
      * @param AuthorService $authorService
      * @return JsonResponse
@@ -43,6 +50,14 @@ class AuthorController extends AbstractController
     }
 
     /**
+     * Редактирование автора
+     *
+     * В теле ожидаются поля:
+     * - idAuthor (обязательно)
+     * - name (необязательно)
+     * - surname (необязательно)
+     * - idBook (необязательно)
+     *
      * @param Request $request
      * @param AuthorService $authorService
      * @return JsonResponse
@@ -71,6 +86,12 @@ class AuthorController extends AbstractController
     }
 
     /**
+     * Удаление авторов по имени и фамилии
+     *
+     * В теле ожидаются поля:
+     * - name
+     * - surname
+     *
      * @param Request $request
      * @param AuthorService $authorService
      * @return JsonResponse
@@ -93,6 +114,16 @@ class AuthorController extends AbstractController
     }
 
     /**
+     * Получение авторов и названия их книг
+     *
+     * Если тело пустое, то будут возвращены все
+     *
+     * Если нужны конкретные, то в теле ожидается массив фильтров:
+     * [
+     *   'a.surname' => 'Лермонтов',
+     *   'b.name' => 'Герой нашего времени'
+     * ]
+     *
      * @param Request $request
      * @param AuthorService $authorService
      * @return JsonResponse

@@ -4,13 +4,22 @@ namespace App\Controller;
 
 use App\Service\PublishingHouseService;
 use Exception;
+use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 
 class PublishingHouseController extends AbstractController
 {
     /**
+     * Создание издательства
+     *
+     * В теле ожидается:
+     * - name (обязательно)
+     * - address (обязательно)
+     * - idBook (необязательно)
+     *
      * @param Request $request
      * @param PublishingHouseService $publishingHouseService
      * @return JsonResponse
@@ -23,9 +32,7 @@ class PublishingHouseController extends AbstractController
 
         try {
             if (isset($body['name']) && isset($body['address'])) {
-
                 $publishingHouseService->createPubHouse($body['name'], $body['address'], $body['idBook'] ?? null);
-
             } else {
                 throw new RuntimeException('Не указаны имя или адрес издательства');
             }
@@ -41,6 +48,13 @@ class PublishingHouseController extends AbstractController
 
 
     /**
+     * Редактирование издательства
+     *
+     * В теле ожидается:
+     * - idPubHouse (обязательно)
+     * - name (необязательно)
+     * - address (необязательно)
+     *
      * @param Request $request
      * @param PublishingHouseService $publishingHouseService
      * @return JsonResponse
@@ -69,6 +83,12 @@ class PublishingHouseController extends AbstractController
     }
 
     /**
+     * Удаление издательств по имени и адресу
+     *
+     * В теле ожидается:
+     * - name (необязательно)
+     * - address (необязательно)
+     *
      * @param Request $request
      * @param PublishingHouseService $publishingHouseService
      * @return JsonResponse
@@ -91,6 +111,16 @@ class PublishingHouseController extends AbstractController
     }
 
     /**
+     * Получение издательств с идентификаторами их книг
+     *
+     * Если тело пустое, то будут возвращены все
+     *
+     * Если нужны конкретные, то в теле ожидается массив фильтров:
+     * [
+     *   'p.name' => 'Росмэн',
+     *   'b.name' => 'Гарри Поттер'
+     * ]
+     *
      * @param Request $request
      * @param PublishingHouseService $publishingHouseService
      * @return JsonResponse

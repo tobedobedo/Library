@@ -8,14 +8,23 @@ use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 
 class BookController extends AbstractController
 {
     /**
+     * Создание книги
+     *
+     * В теле ожидается:
+     * - name (обязательно)
+     * - year (обязательно)
+     * - idPubHouse (обязательно)
+     * - idAuthor (необязательно)
+     *
      * @param Request $request
      * @param BookService $bookService
      * @return JsonResponse
-     * @Route("/api/create-new-book")
+     * @Route ("/api/create-new-book")
      */
     public function createBook(Request $request, BookService $bookService): JsonResponse
     {
@@ -24,10 +33,10 @@ class BookController extends AbstractController
 
         try {
             foreach ($body as $book) {
-                if (isset($book['name']) && isset($book['year'])) {
-                    $bookService->createNewBook($book['name'], $book['year'], $book['idAuthor'] ?? null, $book['idPubHouse'] ?? null);
+                if (isset($book['name']) && isset($book['year']) && $book['idPubHouse']) {
+                    $bookService->createNewBook($book['name'], $book['year'], $book['idPubHouse'], $book['idAuthor'] ?? null);
                 } else {
-                    throw new RuntimeException('Не указаны название книги или год');
+                    throw new RuntimeException('Не указаны название книги, издательство или год');
                 }
             }
         } catch (Exception $e) {
@@ -41,6 +50,15 @@ class BookController extends AbstractController
     }
 
     /**
+     * Редактирование книги
+     *
+     * В теле ожидается:
+     * - idBook (обязательно)
+     * - name (необязательно)
+     * - year (необязательно)
+     * - idAuthor (необязательно)
+     * - idPubHouse (необязательно)
+     *
      * @param Request $request
      * @param BookService $bookService
      * @return JsonResponse
@@ -69,6 +87,11 @@ class BookController extends AbstractController
     }
 
     /**
+     * Удаление книг по имени издательства
+     *
+     * В теле ожидается:
+     * - pubHouseName (обязательно)
+     *
      * @param Request $request
      * @param BookService $bookService
      * @return JsonResponse
@@ -92,6 +115,16 @@ class BookController extends AbstractController
     }
 
     /**
+     * Получение книг с их издательствами и авторами
+     *
+     * Если тело пустое, то будут возвращены все
+     *
+     * Если нужны конкретные, то в теле ожидается массив фильтров:
+     * [
+     *   'p.name' => 'Росмэн',
+     *   'b.name' => 'Гарри Поттер'
+     * ]
+     *
      * @param Request $request
      * @param BookService $bookService
      * @return JsonResponse

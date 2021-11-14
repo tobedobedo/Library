@@ -27,7 +27,7 @@ class BookService
         $this->bookRepository = $em->getRepository(Book::class);
     }
 
-    public function createNewBook(?string $name, ?int $year, ?int $idAuthor, ?int $idPubHouse)
+    public function createNewBook(string $name, int $year, int $idPubHouse, ?int $idAuthor)
     {
         if ($idAuthor >= 1){
 
@@ -78,14 +78,6 @@ class BookService
         }
     }
 
-    /**
-     *
-        $authors = $this->authorRepository->findBy([
-            'name' => 'Вася',
-            'surname' => $surname
-        ]);
-     */
-
     public function removeBooksByPubHouseName(string $pubHouseName)
     {
         /** @var PublishingHouseRepository $repositoryPublishingHouseRepository */
@@ -107,7 +99,6 @@ class BookService
             }
 
             foreach ($books as $book) {
-                echo $book->getName() . "\n";
                 $this->em->remove($book);
             }
 

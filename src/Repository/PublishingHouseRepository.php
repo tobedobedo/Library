@@ -54,7 +54,7 @@ class PublishingHouseRepository extends ServiceEntityRepository
     public function findByFilters(array $filters): array
     {
         $qb = $this->createQueryBuilder('ph')
-            ->select('ph.id', 'ph.address as address', 'ph.name as name', 'book.id as book_id')
+            ->select('ph.id', 'ph.address as address', 'ph.name as name', 'GROUP_CONCAT(book.id) as books')
             ->leftJoin('ph.books', 'book')
         ;
 
@@ -65,9 +65,16 @@ class PublishingHouseRepository extends ServiceEntityRepository
             ;
         }
 
-        return $qb
+        $result = $qb
+            ->groupBy('ph.id')
             ->getQuery()
             ->getResult()
-            ;
+        ;
+
+        foreach ($result as &$ph) {
+            $ph['books'] = explode(',', $ph['books'] ?? '');
+        }
+
+        return $result;
     }
 }
