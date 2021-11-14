@@ -27,22 +27,22 @@ class PublishingHouseService
     /**
      * @param string $name
      * @param string $address
-     * @param int|null $idBook
+     * @param array $books
      */
-    public function createPubHouse(string $name, string $address, ?int $idBook)
+    public function createPubHouse(string $name, string $address, array $books)
     {
-        if ($idBook >= 1){
-            /** @var BookRepository $repository */
-            $repository = $this->em->getRepository(Book::class);
-            $book = $repository->find($idBook);
-        }
+        /** @var BookRepository $repository */
+        $repository = $this->em->getRepository(Book::class);
 
         $pubHouse = new PublishingHouse();
         $pubHouse->setName($name);
         $pubHouse->setAddress($address);
 
-        if (isset($book)) {
-            $pubHouse->addBook($book);
+        foreach ($books as $idBook){
+            $book = $repository->find($idBook);
+            if (isset($book)) {
+                $pubHouse->addBook($book);
+            }
         }
 
         $this->em->persist($pubHouse);

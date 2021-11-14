@@ -32,7 +32,7 @@ class PublishingHouseController extends AbstractController
 
         try {
             if (isset($body['name']) && isset($body['address'])) {
-                $publishingHouseService->createPubHouse($body['name'], $body['address'], $body['idBook'] ?? null);
+                $publishingHouseService->createPubHouse($body['name'], $body['address'], $body['books'] ?? []);
             } else {
                 throw new RuntimeException('Не указаны имя или адрес издательства');
             }
